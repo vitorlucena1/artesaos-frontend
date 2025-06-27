@@ -7,7 +7,8 @@ function Register() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
+    password: '',
+    role: 'artesan' // valor padrão correto
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,7 +29,15 @@ function Register() {
     setLoading(true);
 
     try {
-      const response = await api.register(formData.name, formData.email, formData.password);
+      // Debug: veja o que está sendo enviado
+      // console.log('Enviando para API:', formData);
+
+      const response = await api.register(
+        formData.name,
+        formData.email,
+        formData.password,
+        formData.role
+      );
       login(response.user, response.token);
       navigate('/dashboard');
     } catch (err) {
@@ -50,7 +59,7 @@ function Register() {
             id="name" 
             name="name" 
             value={formData.name}
-            onChange={handleChange}
+            onChange={e => setFormData({ ...formData, name: e.target.value })}
             required 
           />
         </div>
@@ -61,7 +70,7 @@ function Register() {
             id="email" 
             name="email" 
             value={formData.email}
-            onChange={handleChange}
+            onChange={e => setFormData({ ...formData, email: e.target.value })}
             required 
           />
         </div>
@@ -72,9 +81,22 @@ function Register() {
             id="password" 
             name="password" 
             value={formData.password}
-            onChange={handleChange}
+            onChange={e => setFormData({ ...formData, password: e.target.value })}
             required 
           />
+        </div>
+        <div>
+          <label htmlFor="role">Perfil:</label>
+          <select
+            id="role"
+            name="role"
+            value={formData.role}
+            onChange={e => setFormData({ ...formData, role: e.target.value })}
+            required
+          >
+            <option value="artesan">Artesão</option>
+            <option value="visitante">Visitante</option>
+          </select>
         </div>
         <button type="submit" disabled={loading}>
           {loading ? 'Registrando...' : 'Registrar'}

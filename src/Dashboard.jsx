@@ -21,8 +21,15 @@ function Dashboard() {
 
   const loadProducts = async () => {
     try {
-      const data = await api.getProducts(token); // Passe o token aqui
-      setProducts(data);
+      const data = await api.getProducts(token);
+      // Garante que só aparecem produtos do artesão logado
+      const myProducts = user.role === 'artesan'
+        ? data.filter(prod =>
+            (prod.artisan && prod.artisan._id === user._id) ||
+            (prod.artisanId && prod.artisanId === user._id)
+          )
+        : data;
+      setProducts(myProducts);
     } catch (err) {
       setError('Erro ao carregar produtos');
     } finally {
@@ -50,6 +57,16 @@ function Dashboard() {
       ...newProduct,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handleDeleteProduct = async (productId) => {
+    if (!window.confirm('Tem certeza que deseja apagar este produto?')) return;
+    try {
+      await api.deleteProduct(productId, token);
+      loadProducts();
+    } catch (err) {
+      setError('Erro ao apagar produto');
+    }
   };
 
   return (
@@ -131,6 +148,21 @@ function Dashboard() {
                     <p className="product-category">{product.category}</p>
                     <p className="product-description">{product.description}</p>
                     <p className="product-price">R$ {product.price.toFixed(2)}</p>
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDeleteProduct(product._id)}
+                      style={{
+                        marginTop: '1rem',
+                        background: '#C53030',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '0.5rem 1rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Deletar
+                    </button>
                   </div>
                 ))
               )}

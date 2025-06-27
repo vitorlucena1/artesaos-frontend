@@ -19,13 +19,13 @@ export const api = {
     return response.json();
   },
 
-  register: async (name, email, password) => {
+  register: async (name, email, password, role) => {
     const response = await fetch(`${API_BASE_URL}/users/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, role }),
     });
     
     if (!response.ok) {
@@ -67,6 +67,20 @@ export const api = {
       throw new Error(error.message || 'Erro ao criar produto');
     }
     
+    return response.json();
+  },
+
+  deleteProduct: async (productId, token) => {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Erro ao deletar produto');
+    }
     return response.json();
   },
 };
